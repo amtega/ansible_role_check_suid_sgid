@@ -1,0 +1,25 @@
+---
+
+- name: find suid/guid programs
+  become: true
+  shell: "{{ command_to_find_files }}"
+  ignore_errors: true
+  no_log: True
+  register: find_output
+  changed_when: false
+
+- name: list of files found
+  debug:
+    msg: "{{ find_output.stdout_lines }}"
+  when: debug_messages
+
+- set_fact:
+    list_of_files: "{{ find_output.stdout_lines
+                    | reject('search','/log' )
+                    | reject('search','/sys')
+                    | reject('search','/proc')
+                    | list }}"
+
+- debug:
+    msg: "{{ list_of_files }}"
+  when: debug_messages
