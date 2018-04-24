@@ -15,9 +15,9 @@
 
   tags:
     - idempotence
-
-- name: cleanup docker docker sandbox
-  hosts: localhost
-  roles:
-    - role: amtega.docker_sandbox
-      docker_sandbox_state: absent
+#
+# - name: cleanup docker docker sandbox
+#   hosts: localhost
+#   roles:
+#     - role: amtega.docker_sandbox
+#       docker_sandbox_state: absent

@@ -1,10 +1,11 @@
 ---
 # Role tasks
 
+- include: check.yml
+
 - include: find.yml
 
 - name: search of packages for files with rpm
-  #shell: "rpm -qf {{ item }}"
   shell: "{{ check_suid_sgid_command_to_query_packages }} {{ item }}"
   args:
     warn: False
