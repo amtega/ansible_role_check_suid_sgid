@@ -1,2 +1,18 @@
 ---
 # Role tasks
+
+- include: check.yml
+
+- include: find.yml
+
+- name: search of packages for files with rpm
+  shell: "{{ check_suid_sgid_command_to_query_packages }} {{ item }}"
+  args:
+    warn: False
+  register: check_suid_sgid_rpm_output
+  loop: "{{ check_suid_sgid_list_of_files }}"
+  changed_when: false
+
+- debug:
+    msg: "file: {{ item.item }} --> package: {{ item.stdout }}"
+  loop: "{{ check_suid_sgid_rpm_output.results }}"

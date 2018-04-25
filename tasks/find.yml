@@ -1,0 +1,25 @@
+---
+
+- name: find suid/sgid programs
+  become: true
+  shell: "{{ check_suid_sgid_command_to_find_files }}"
+  ignore_errors: true
+  no_log: True
+  register: check_suid_sgid_find_output
+  changed_when: false
+
+- name: list of files found
+  debug:
+    msg: "{{ check_suid_sgid_find_output.stdout_lines }}"
+  when: check_suid_sgid_debug_messages
+
+- set_fact:
+    check_suid_sgid_list_of_files: "{{ check_suid_sgid_find_output.stdout_lines
+                                    | reject('search','/log' )
+                                    | reject('search','/sys')
+                                    | reject('search','/proc')
+                                    | list }}"
+
+- debug:
+    msg: "{{ check_suid_sgid_list_of_files }}"
+  when: check_suid_sgid_debug_messages

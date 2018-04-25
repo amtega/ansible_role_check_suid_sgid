@@ -1,2 +1,23 @@
 ---
 # Tasks for testing role
+
+- name: run idempotence test
+  hosts: localhost
+  roles:
+    - role: amtega.docker_presets
+    - role: amtega.docker_sandbox
+      docker_sandbox_state: started
+
+- name: test role amtega.check_suid_sgid
+  hosts: docker_sandbox_containers
+  roles:
+    - amtega.check_suid_sgid
+
+  tags:
+    - idempotence
+#
+# - name: cleanup docker docker sandbox
+#   hosts: localhost
+#   roles:
+#     - role: amtega.docker_sandbox
+#       docker_sandbox_state: absent
