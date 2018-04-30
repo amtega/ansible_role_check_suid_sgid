@@ -22,6 +22,7 @@
     -print
   changed_when: false
   register: check_suid_sgid_search_result
+  check_mode: no
 
 - name: search packages owning suid/sgid files
   shell: "rpm -qf --queryformat '%{NAME}' {{ item }}"
@@ -37,6 +38,7 @@
        | reject('search','^/run')
        | reject('search','^/sys')
        | list }}
+  check_mode: no
 
 - name: setup facts with packages/files with suid/sgid
   set_fact:
@@ -72,3 +74,26 @@
     - item not in check_suid_sgid_excluded_files
     - check_suid_sgid_files_state == "absent"
   loop: "{{ check_suid_sgid_files_found }}"
+
+- fail:
+    msg: >-
+      The following packages containt suid/sgid files:
+      {{ packages | join(", ") }}
+
+      The following files have suid/sgid bits activated:
+      {{ files | join(", ") }}
+  when:
+    - >-
+      check_suid_sgid_packages_state == "fail"
+      or check_suid_sgid_files_state == "fail"
+
+    - packages | length > 0 or files | length > 0
+  vars:
+    packages: >-
+      {{ check_suid_sgid_packages_found
+         | reject("in", check_suid_sgid_excluded_packages)
+         | list }}
+    files: >-
+      {{ check_suid_sgid_files_found
+         | reject("in", check_suid_sgid_excluded_files)
+         | list }}
