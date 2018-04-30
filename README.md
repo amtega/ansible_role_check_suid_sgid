@@ -1,16 +1,19 @@
 # role_name
 
-This role search for files with SUID or GUID bit set.
+This role search packages/files with suid or guid bit set and allows you to remove them.
 
 ## Requirements
 
-This role only works with rpm program installed in the hosts.
-
-Ansible >= 2.4
+[Ansible 2.5+](http://docs.ansible.com/ansible/latest/intro_installation.html)
 
 ## Role Variables
 
 A list of all the default variables for this role is available in `defaults/main.yml`.
+
+The role setups the following facts:
+
+- check_suid_sgid_packages_found: list of installed packages that have suid/sgid files.
+- check_suid_sgid_packages_found: list of suid/sgid files not installed by any know package.
 
 ## Dependencies
 
@@ -25,11 +28,16 @@ This is an example playbook:
 
 - hosts: all
   roles:
-    - amtega.awx
+    - role: amtega.check_suid_sgid
+      check_suid_sgid_packages_state: absent
+      check_suid_sgid_files_state: absent
 ```
 
-
 ## Testing
+
+Tests are based on docker containers. You can setup docker engine quickly using the playbook `files/setup.yml` available in the role [amtega.docker_engine](https://galaxy.ansible.com/amtega/docker_engine).
+
+Once you have docker, you can run the tests with the following commands:
 
 ```shell
 $ cd amtega.check_suid_sgid/test
@@ -55,3 +63,4 @@ GNU General Public License for more details or European Union Public License for
 ## Author Information
 
 - Carlos Chedas Fernandez.
+- Juan Antonio Valiño García.

@@ -1,18 +1,99 @@
 ---
 # Role tasks
 
-- include: check.yml
+- name: setup dependency packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ check_suid_sgid_dependency_packages }}"
 
-- include: find.yml
-
-- name: search of packages for files with rpm
-  shell: "{{ check_suid_sgid_command_to_query_packages }} {{ item }}"
-  args:
-    warn: False
-  register: check_suid_sgid_rpm_output
-  loop: "{{ check_suid_sgid_list_of_files }}"
+- name: search suid/sgid programs
+  shell: >-
+    find /
+    \(
+    -path
+    {{ check_suid_sgid_excluded_dirs
+       | join(" -prune -o -path ")
+    }}
+    \)
+    -prune
+    -o
+    \( -perm -4000 -or -perm -2000 \)
+    -print
   changed_when: false
+  register: check_suid_sgid_search_result
+  check_mode: no
 
-- debug:
-    msg: "file: {{ item.item }} --> package: {{ item.stdout }}"
-  loop: "{{ check_suid_sgid_rpm_output.results }}"
+- name: search packages owning suid/sgid files
+  shell: "rpm -qf --queryformat '%{NAME}' {{ item }}"
+  args:
+    warn: false
+  failed_when: false
+  changed_when: false
+  when:
+  register: check_suid_sgid_search_packages_result
+  loop: >-
+    {{ check_suid_sgid_search_result.stdout_lines
+       | reject('search','^/proc')
+       | reject('search','^/run')
+       | reject('search','^/sys')
+       | list }}
+  check_mode: no
+
+- name: setup facts with packages/files with suid/sgid
+  set_fact:
+    check_suid_sgid_packages_found: >-
+      {{ check_suid_sgid_search_packages_result.results
+         | selectattr("rc", "equalto", 0)
+         | map(attribute="stdout")
+         | list
+         | sort
+         | unique }}
+    check_suid_sgid_files_found: >-
+      {{ check_suid_sgid_search_packages_result.results
+         | selectattr("rc", "greaterthan", 0)
+         | map(attribute="item")
+         | list
+         | sort
+         | unique }}
+
+- name: remove packages with suid/sgid files
+  package:
+    name: "{{ item }}"
+    state: absent
+  when:
+    - item not in check_suid_sgid_excluded_packages
+    - check_suid_sgid_packages_state == "absent"
+  loop: "{{ check_suid_sgid_packages_found }}"
+
+- name: remove files with suid/sgid files
+  file:
+    path: "{{ item }}"
+    state: "{{ check_suid_sgid_files_state }}"
+  when:
+    - item not in check_suid_sgid_excluded_files
+    - check_suid_sgid_files_state == "absent"
+  loop: "{{ check_suid_sgid_files_found }}"
+
+- fail:
+    msg: >-
+      The following packages containt suid/sgid files:
+      {{ packages | join(", ") }}
+
+      The following files have suid/sgid bits activated:
+      {{ files | join(", ") }}
+  when:
+    - >-
+      check_suid_sgid_packages_state == "fail"
+      or check_suid_sgid_files_state == "fail"
+
+    - packages | length > 0 or files | length > 0
+  vars:
+    packages: >-
+      {{ check_suid_sgid_packages_found
+         | reject("in", check_suid_sgid_excluded_packages)
+         | list }}
+    files: >-
+      {{ check_suid_sgid_files_found
+         | reject("in", check_suid_sgid_excluded_files)
+         | list }}

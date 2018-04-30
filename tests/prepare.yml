@@ -1,0 +1,22 @@
+---
+# Prepare sandbox for tests
+
+- name: prepare sandox for tests
+  hosts: docker_sandbox_containers
+  tasks:
+    - name: install a package that have a suid/sgid file
+      package:
+        name: screen
+        state: present
+
+    - name: create a suid file
+      copy:
+        dest: /tmp/suid_file
+        content: Hello World
+        mode: 4000
+
+    - name: create a sgid file
+      copy:
+        dest: /tmp/suid_file
+        content: Hello World
+        mode: 2000

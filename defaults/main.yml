@@ -1,2 +1,75 @@
 ---
 # Role default lower priority variables
+
+# State for found packages that own a suid/sgid file. Can be absent (remove the
+# package), present (don't touch the package) or fail (raise role error)
+
+check_suid_sgid_packages_state: fail
+
+# State suid/sgid files found. Can be absent (remove the file), present
+# (don't touch the file) or fail (raise role error)
+
+check_suid_sgid_files_state: fail
+
+# Directories to exclude from suid/sgid search
+
+check_suid_sgid_excluded_dirs:
+  - /proc
+  - /run
+  - /sys
+  - /var/lib/docker
+  - /var/log/journal
+
+# Packages to exclude from role actions
+
+check_suid_sgid_excluded_packages:
+  - abrt-addon-ccpp
+  - at
+  - ccache
+  - ceph-common
+  - coreutils
+  - cronie
+  - dbus
+  - fuse
+  - glibc-common
+  - glusterfs-fuse
+  - google-chrome-stable
+  - initscripts
+  - iputils
+  - kde-runtime
+  - kdelibs
+  - kf5-kdesu
+  - krb5-workstation
+  - libutempter
+  - lockdev
+  - mlocate
+  - mtr
+  - nfs-utils
+  - openssh
+  - openssh-clients
+  - passwd
+  - pam
+  - policycoreutils-sandbox
+  - polkit
+  - procmail
+  - qemu-common
+  - sendmail
+  - shadow-utils
+  - spice-glib
+  - sudo
+  - systemtap-runtime
+  - sysvinit-tools
+  - uml_utilities
+  - util-linux
+  - util-linux-ng
+  - util-linux-user
+  - usermode
+  - VirtualBox-server
+  - vte
+  - vte3
+  - x2goserver
+  - xorg-x11-server-Xorg
+
+# Files to preserve from role actions
+
+check_suid_sgid_excluded_files: []

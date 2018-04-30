@@ -1,25 +1,22 @@
 galaxy_info:
-  author: Carlos Chedas Fernandez
-  description: Check for files with SUID or SGID bits set.
+  author: Carlos Chedas Fernandez / Juan Antonio Valiño García
+  description: Manage packages/files with suid or sgid bits.
   company: AMTEGA - Xunta de Galicia
-
   license: GPLv3 or EUPL
-
-  min_ansible_version: 2.4
-
+  min_ansible_version: 2.5
   platforms:
   - name: Fedora
     versions:
       - 26
       - 27
-
   - name: EL
     versions:
       - 6
       - 7
-
     galaxy_tags:
-    - ansible
     - system
+    - suid
+    - sgid
+    - security
 
 dependencies: []
