@@ -17,26 +17,58 @@ check_suid_sgid_excluded_dirs:
   - /proc
   - /run
   - /sys
+  - /var/lib/docker
   - /var/log/journal
 
 # Packages to exclude from role actions
 
 check_suid_sgid_excluded_packages:
+  - abrt-addon-ccpp
+  - at
+  - ccache
+  - ceph-common
   - coreutils
+  - cronie
   - dbus
+  - fuse
   - glibc-common
+  - glusterfs-fuse
+  - google-chrome-stable
   - initscripts
   - iputils
+  - kde-runtime
+  - kdelibs
+  - kf5-kdesu
+  - krb5-workstation
   - libutempter
+  - lockdev
+  - mlocate
+  - mtr
+  - nfs-utils
   - openssh
   - openssh-clients
   - passwd
   - pam
+  - policycoreutils-sandbox
+  - polkit
+  - procmail
+  - qemu-common
+  - sendmail
   - shadow-utils
+  - spice-glib
   - sudo
+  - systemtap-runtime
   - sysvinit-tools
+  - uml_utilities
   - util-linux
   - util-linux-ng
+  - util-linux-user
+  - usermode
+  - VirtualBox-server
+  - vte
+  - vte3
+  - x2goserver
+  - xorg-x11-server-Xorg
 
 # Files to preserve from role actions
 
