@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: check_suid_sgid
   author: Carlos Chedas Fernandez / Juan Antonio Valiño García
   description: Manage packages/files with suid or sgid bits.
   company: AMTEGA - Xunta de Galicia
