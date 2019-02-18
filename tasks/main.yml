@@ -69,7 +69,8 @@
     - check_suid_sgid_files_state == "absent"
   loop: "{{ check_suid_sgid_files_found }}"
 
-- fail:
+- name: stop playbook if there are suid/sgid files
+  fail:
     msg: >-
       The following packages containt suid/sgid files:
       {{ packages | join(", ") }}
