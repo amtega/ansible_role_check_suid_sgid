@@ -1,3 +1,6 @@
+---
+# Role dependencies
+
 galaxy_info:
   role_name: check_suid_sgid
   author: Carlos Chedas Fernandez / Juan Antonio Valiño García
@@ -6,15 +9,15 @@ galaxy_info:
   license: GPLv3 or EUPL
   min_ansible_version: 2.7
   platforms:
-  - name: Fedora
-    versions:
-      - 27
-      - 28
-  - name: EL
-    versions:
-      - 6
-      - 7
-    galaxy_tags:
+    - name: EL
+      versions:
+        - 6
+        - 7
+    - name: Fedora
+      versions:
+        - 27
+        - 28
+  galaxy_tags:
     - system
     - suid
     - sgid
