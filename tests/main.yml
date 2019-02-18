@@ -10,17 +10,23 @@
 
 # Setup docker containers
 
-- name: setup docker containers
+- name: run idempotence test
   hosts: localhost
   roles:
     - role: amtega.docker_presets
+      docker_presets_images_json_query: >-
+        [? starts_with(name, `centos-6`)
+           || starts_with(name, `centos-7`)
+           || starts_with(name, `fedora-27`)
+           || starts_with(name, `fedora-28`) ]
+
     - role: amtega.docker_sandbox
       docker_sandbox_state: started
       docker_sandbox_idempotence_test: false
   tags:
     - sandbox
 
-# Prepare docker containers creating fake grub config files
+# Prepare docker containers installing a package that have a suid/sgid file
 
 - import_playbook: prepare.yml
   tags:
@@ -94,4 +100,5 @@
   - role: amtega.docker_sandbox
     docker_sandbox_state: absent
   tags:
+    - cleanup
     - sandbox
