@@ -1,14 +1,8 @@
 ---
 # Role tasks
 
-- name: setup dependency packages
-  package:
-    name: "{{ item }}"
-    state: present
-  loop: "{{ check_suid_sgid_dependency_packages }}"
-
 - name: search suid/sgid programs
-  shell: >-
+  command: >-
     find /
     \(
     -path
@@ -25,7 +19,7 @@
   check_mode: no
 
 - name: search packages owning suid/sgid files
-  shell: "rpm -qf --queryformat '%{NAME}' {{ item }}"
+  command: "rpm -qf --queryformat '%{NAME}' {{ item }}"
   args:
     warn: false
   failed_when: false

@@ -1,7 +1,0 @@
----
-# Role variables
-
-# Dependency packages
-
-check_suid_sgid_dependency_packages:
-  - findutils

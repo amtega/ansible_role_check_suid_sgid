@@ -4,12 +4,12 @@ galaxy_info:
   description: Manage packages/files with suid or sgid bits.
   company: AMTEGA - Xunta de Galicia
   license: GPLv3 or EUPL
-  min_ansible_version: 2.5
+  min_ansible_version: 2.7
   platforms:
   - name: Fedora
     versions:
-      - 26
       - 27
+      - 28
   - name: EL
     versions:
       - 6
@@ -20,4 +20,15 @@ galaxy_info:
     - sgid
     - security
 
-dependencies: []
+dependencies:
+  - role: amtega.check_platform
+    check_platform_distributions:
+      centos: 6
+      fedora: 27
+      rhel: 6
+
+  - role: amtega.packages
+    packages_os:
+      all:
+        all:
+          findutils: present
