@@ -2,10 +2,6 @@
 
 This role search packages/files with suid or guid bit set and allows you to remove them.
 
-## Requirements
-
-[Ansible 2.7+](http://docs.ansible.com/ansible/latest/intro_installation.html)
-
 ## Role Variables
 
 A list of all the default variables for this role is available in `defaults/main.yml`.
@@ -14,11 +10,6 @@ The role setups the following facts:
 
 - check_suid_sgid_packages_found: list of installed packages that have suid/sgid files.
 - check_suid_sgid_packages_found: list of suid/sgid files not installed by any know package.
-
-## Dependencies
-
-- [amtega.check_platform](https://galaxy.ansible.com/amtega/check_platform)
-- [amtega.packages](https://galaxy.ansible.com/amtega/packages)
 
 ## Example Playbook
 
