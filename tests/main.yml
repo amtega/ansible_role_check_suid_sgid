@@ -10,7 +10,7 @@
 
 # Setup docker containers
 
-- name: run idempotence test
+- name: Setup testing sandbox
   hosts: localhost
   roles:
     - role: amtega.docker_presets
@@ -34,7 +34,7 @@
 
 # Run idempotence test calling "manually" the idempotence_tester role
 
-- name: run idempotence test
+- name: Run idempotence test
   hosts: localhost
   roles:
     - role: amtega.idempotence_tester
@@ -43,7 +43,7 @@
 
 # Regenerate docker containers after running idempotence test
 
-- name: regenerate docker containers
+- name: Regenerate docker containers
   hosts: localhost
   roles:
     - role: amtega.docker_sandbox
@@ -58,7 +58,7 @@
 
 # Run role tests
 
-- name: test role amtega.check_suid_sgid
+- name: Test role amtega.check_suid_sgid
   hosts: docker_sandbox_containers
   roles:
     - role: amtega.check_suid_sgid
@@ -67,7 +67,7 @@
   tags:
     - idempotence
   tasks:
-    - name: check for suid/sgid test package
+    - name: Check for suid/sgid test package
       shell: rpm -q screen
       args:
         warn: false
@@ -75,17 +75,17 @@
       failed_when: false
       register: check_package_result
 
-    - name: check for suid test file
+    - name: Check for suid test file
       stat:
         path: /tmp/suid_file
       register: check_suid_file_result
 
-    - name: check for sgid test file
+    - name: Check for sgid test file
       stat:
         path: /tmp/sgid_file
       register: check_sgid_file_result
 
-    - name: verify that role removed package/files with suid/sgid
+    - name: Verify that role removed package/files with suid/sgid
       assert:
         that:
           - check_package_result.rc != 0
@@ -94,7 +94,7 @@
 
 # Cleanup sandbox environment
 
-- name: cleanup docker docker sandbox
+- name: Cleanup testing sandbox
   hosts: localhost
   roles:
   - role: amtega.docker_sandbox
