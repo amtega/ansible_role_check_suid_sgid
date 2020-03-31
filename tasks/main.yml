@@ -1,7 +1,7 @@
 ---
 # Role tasks
 
-- name: search suid/sgid programs
+- name: Search suid/sgid programs
   command: >-
     find /
     \(
@@ -18,7 +18,7 @@
   register: check_suid_sgid_search_result
   check_mode: no
 
-- name: search packages owning suid/sgid files
+- name: Search packages owning suid/sgid files
   command: "rpm -qf --queryformat '%{NAME}' {{ item }}"
   args:
     warn: false
@@ -34,7 +34,7 @@
        | list }}
   check_mode: no
 
-- name: setup facts with packages/files with suid/sgid
+- name: Setup facts with packages/files with suid/sgid
   set_fact:
     check_suid_sgid_packages_found: >-
       {{ check_suid_sgid_search_packages_result.results
@@ -51,7 +51,7 @@
          | sort
          | unique }}
 
-- name: remove packages with suid/sgid files
+- name: Remove packages with suid/sgid files
   package:
     name: "{{ item }}"
     state: absent
@@ -60,7 +60,7 @@
     - check_suid_sgid_packages_state == "absent"
   loop: "{{ check_suid_sgid_packages_found }}"
 
-- name: remove files with suid/sgid files
+- name: Remove files with suid/sgid files
   file:
     path: "{{ item }}"
     state: "{{ check_suid_sgid_files_state }}"
@@ -69,7 +69,7 @@
     - check_suid_sgid_files_state == "absent"
   loop: "{{ check_suid_sgid_files_found }}"
 
-- name: stop playbook if there are suid/sgid files
+- name: Stop playbook if there are suid/sgid files
   fail:
     msg: >-
       The following packages containt suid/sgid files:
