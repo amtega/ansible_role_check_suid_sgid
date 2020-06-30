@@ -1,8 +1,8 @@
 ---
-# Prepare sandbox for tests
 
-- name: Prepare sandox for tests
-  hosts: docker_sandbox_containers
+- name: Prepare
+  hosts: molecule_hosts
+  gather_facts: no
   tasks:
     - name: Install a package that have a suid/sgid file
       package:

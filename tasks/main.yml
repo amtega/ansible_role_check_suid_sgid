@@ -1,94 +1,97 @@
 ---
 # Role tasks
 
-- name: Search suid/sgid programs
-  command: >-
-    find /
-    \(
-    -path
-    {{ check_suid_sgid_excluded_dirs
-       | join(" -prune -o -path ")
-    }}
-    \)
-    -prune
-    -o
-    \( -perm -4000 -or -perm -2000 \)
-    -print
-  changed_when: false
-  register: check_suid_sgid_search_result
-  check_mode: no
+- block:
+    - name: Search suid/sgid programs
+      command: >-
+        find /
+        \(
+        -path
+        {{ check_suid_sgid_excluded_dirs
+           | join(" -prune -o -path ")
+        }}
+        \)
+        -prune
+        -o
+        \( -perm -4000 -or -perm -2000 \)
+        -print
+      changed_when: false
+      register: check_suid_sgid_search_result
+      check_mode: no
 
-- name: Search packages owning suid/sgid files
-  command: "rpm -qf --queryformat '%{NAME}' {{ item }}"
-  args:
-    warn: false
-  failed_when: false
-  changed_when: false
-  when:
-  register: check_suid_sgid_search_packages_result
-  loop: >-
-    {{ check_suid_sgid_search_result.stdout_lines
-       | reject('search','^/proc')
-       | reject('search','^/run')
-       | reject('search','^/sys')
-       | list }}
-  check_mode: no
+    - name: Search packages owning suid/sgid files
+      command: "rpm -qf --queryformat '%{NAME}' {{ item }}"
+      args:
+        warn: false
+      failed_when: false
+      changed_when: false
+      when:
+      register: check_suid_sgid_search_packages_result
+      loop: >-
+        {{ check_suid_sgid_search_result.stdout_lines
+           | reject('search','^/proc')
+           | reject('search','^/run')
+           | reject('search','^/sys')
+           | list }}
+      check_mode: no
 
-- name: Setup facts with packages/files with suid/sgid
-  set_fact:
-    check_suid_sgid_packages_found: >-
-      {{ check_suid_sgid_search_packages_result.results
-         | selectattr("rc", "equalto", 0)
-         | map(attribute="stdout")
-         | list
-         | sort
-         | unique }}
-    check_suid_sgid_files_found: >-
-      {{ check_suid_sgid_search_packages_result.results
-         | selectattr("rc", "greaterthan", 0)
-         | map(attribute="item")
-         | list
-         | sort
-         | unique }}
+    - name: Setup facts with packages/files with suid/sgid
+      set_fact:
+        check_suid_sgid_packages_found: >-
+          {{ check_suid_sgid_search_packages_result.results
+             | selectattr("rc", "equalto", 0)
+             | map(attribute="stdout")
+             | list
+             | sort
+             | unique }}
+        check_suid_sgid_files_found: >-
+          {{ check_suid_sgid_search_packages_result.results
+             | selectattr("rc", "greaterthan", 0)
+             | map(attribute="item")
+             | list
+             | sort
+             | unique }}
 
-- name: Remove packages with suid/sgid files
-  package:
-    name: "{{ item }}"
-    state: absent
-  when:
-    - item not in check_suid_sgid_excluded_packages
-    - check_suid_sgid_packages_state == "absent"
-  loop: "{{ check_suid_sgid_packages_found }}"
+    - name: Remove packages with suid/sgid files
+      package:
+        name: "{{ item }}"
+        state: absent
+      when:
+        - item not in check_suid_sgid_excluded_packages
+        - check_suid_sgid_packages_state == "absent"
+      loop: "{{ check_suid_sgid_packages_found }}"
 
-- name: Remove files with suid/sgid files
-  file:
-    path: "{{ item }}"
-    state: "{{ check_suid_sgid_files_state }}"
-  when:
-    - item not in check_suid_sgid_excluded_files
-    - check_suid_sgid_files_state == "absent"
-  loop: "{{ check_suid_sgid_files_found }}"
+    - name: Remove files with suid/sgid files
+      file:
+        path: "{{ item }}"
+        state: "{{ check_suid_sgid_files_state }}"
+      when:
+        - item not in check_suid_sgid_excluded_files
+        - check_suid_sgid_files_state == "absent"
+      loop: "{{ check_suid_sgid_files_found }}"
 
-- name: Stop playbook if there are suid/sgid files
-  fail:
-    msg: >-
-      The following packages containt suid/sgid files:
-      {{ packages | join(", ") }}
+    - name: Stop playbook if there are suid/sgid files
+      fail:
+        msg: >-
+          The following packages containt suid/sgid files:
+          {{ packages | join(", ") }}
 
-      The following files have suid/sgid bits activated:
-      {{ files | join(", ") }}
-  when:
-    - >-
-      check_suid_sgid_packages_state == "fail"
-      or check_suid_sgid_files_state == "fail"
+          The following files have suid/sgid bits activated:
+          {{ files | join(", ") }}
+      when:
+        - >-
+          check_suid_sgid_packages_state == "fail"
+          or check_suid_sgid_files_state == "fail"
 
-    - packages | length > 0 or files | length > 0
-  vars:
-    packages: >-
-      {{ check_suid_sgid_packages_found
-         | reject("in", check_suid_sgid_excluded_packages)
-         | list }}
-    files: >-
-      {{ check_suid_sgid_files_found
-         | reject("in", check_suid_sgid_excluded_files)
-         | list }}
+        - packages | length > 0 or files | length > 0
+      vars:
+        packages: >-
+          {{ check_suid_sgid_packages_found
+             | reject("in", check_suid_sgid_excluded_packages)
+             | list }}
+        files: >-
+          {{ check_suid_sgid_files_found
+             | reject("in", check_suid_sgid_excluded_files)
+             | list }}
+  tags:
+    - role::check_suid_sgid

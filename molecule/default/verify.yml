@@ -1,0 +1,30 @@
+---
+
+- name: Verify
+  hosts: molecule_hosts
+  gather_facts: no
+  tasks:
+    - name: Check for suid/sgid test package
+      shell: rpm -q screen
+      args:
+        warn: false
+      changed_when: false
+      failed_when: false
+      register: check_package_result
+
+    - name: Check for suid test file
+      stat:
+        path: /tmp/suid_file
+      register: check_suid_file_result
+
+    - name: Check for sgid test file
+      stat:
+        path: /tmp/sgid_file
+      register: check_sgid_file_result
+
+    - name: Verify that role removed package/files with suid/sgid
+      assert:
+        that:
+          - check_package_result.rc != 0
+          - not check_suid_file_result.stat.exists
+          - not check_sgid_file_result.stat.exists
