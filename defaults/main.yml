@@ -30,6 +30,7 @@ check_suid_sgid_excluded_packages:
   - coreutils
   - cronie
   - dbus
+  - dbus-daemon
   - fuse
   - glibc-common
   - glusterfs-fuse
