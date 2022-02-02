@@ -2,21 +2,24 @@
 
 - name: Prepare
   hosts: molecule_hosts
-  gather_facts: no
+  gather_facts: yes
   tasks:
     - name: Install a package that have a suid/sgid file
       package:
         name: screen
         state: present
+      when: >-
+        not ( ansible_facts['distribution'] == 'CentOS'
+        and ansible_facts['distribution_major_version'] == '8')
 
     - name: Create a suid file
       copy:
         dest: /tmp/suid_file
         content: Hello World
-        mode: 4000
+        mode: 04000
 
     - name: Create a sgid file
       copy:
         dest: /tmp/suid_file
         content: Hello World
-        mode: 2000
+        mode: 02000
