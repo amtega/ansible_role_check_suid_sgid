@@ -15,16 +15,16 @@
         -o
         \( -perm -4000 -or -perm -2000 \)
         -print
-      changed_when: false
+      changed_when: no
       register: check_suid_sgid_search_result
       check_mode: no
 
     - name: Search packages owning suid/sgid files
       command: "rpm -qf --queryformat '%{NAME}' {{ item }}"
       args:
-        warn: false
-      failed_when: false
-      changed_when: false
+        warn: no
+      failed_when: no
+      changed_when: no
       when:
       register: check_suid_sgid_search_packages_result
       loop: >-
@@ -61,7 +61,7 @@
         - check_suid_sgid_packages_state == "absent"
       loop: "{{ check_suid_sgid_packages_found }}"
 
-    - name: Remove files with suid/sgid files
+    - name: Remove files with suid/sgid files # noqa risky-file-permissions
       file:
         path: "{{ item }}"
         state: "{{ check_suid_sgid_files_state }}"
