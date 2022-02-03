@@ -5,11 +5,11 @@
   gather_facts: no
   tasks:
     - name: Check for suid/sgid test package
-      shell: rpm -q screen
+      command: rpm -q screen
       args:
-        warn: false
-      changed_when: false
-      failed_when: false
+        warn: no
+      changed_when: no
+      failed_when: no
       register: check_package_result
 
     - name: Check for suid test file

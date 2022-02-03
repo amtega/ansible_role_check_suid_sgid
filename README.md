@@ -21,8 +21,9 @@ This is an example playbook:
 - hosts: all
   roles:
     - role: amtega.check_suid_sgid
-      check_suid_sgid_packages_state: absent
-      check_suid_sgid_files_state: absent
+      vars:
+        check_suid_sgid_packages_state: absent
+        check_suid_sgid_files_state: absent
 ```
 
 ## Testing
@@ -37,7 +38,7 @@ molecule test --all
 
 ## License
 
-Copyright (C) 2020 AMTEGA - Xunta de Galicia
+Copyright (C) 2022 AMTEGA - Xunta de Galicia
 
 This role is free software: you can redistribute it and/or modify it under the terms of:
 
