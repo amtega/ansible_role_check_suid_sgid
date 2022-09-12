@@ -5,7 +5,7 @@
   gather_facts: yes
   tasks:
     - name: Install a package that have a suid/sgid file
-      package:
+      ansible.builtin.package:
         name: screen
         state: present
       when: >-
@@ -13,13 +13,13 @@
         and ansible_facts['distribution_major_version'] == '8')
 
     - name: Create a suid file
-      copy:
+      ansible.builtin.copy:
         dest: /tmp/suid_file
         content: Hello World
         mode: 04000
 
     - name: Create a sgid file
-      copy:
+      ansible.builtin.copy:
         dest: /tmp/suid_file
         content: Hello World
         mode: 02000
