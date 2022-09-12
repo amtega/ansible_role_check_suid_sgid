@@ -1,9 +1,9 @@
 ---
-# Role tasks
 
-- block:
+- name: Check suid/sgig programs
+  block:
     - name: Search suid/sgid programs
-      command: >-
+      ansible.builtin.command: >-
         find /
         \(
         -path
@@ -20,12 +20,11 @@
       check_mode: no
 
     - name: Search packages owning suid/sgid files
-      command: "rpm -qf --queryformat '%{NAME}' {{ item }}"
+      ansible.builtin.command: "rpm -qf --queryformat '%{NAME}' {{ item }}"
       args:
         warn: no
       failed_when: no
       changed_when: no
-      when:
       register: check_suid_sgid_search_packages_result
       loop: >-
         {{ check_suid_sgid_search_result.stdout_lines
@@ -36,7 +35,7 @@
       check_mode: no
 
     - name: Setup facts with packages/files with suid/sgid
-      set_fact:
+      ansible.builtin.set_fact:
         check_suid_sgid_packages_found: >-
           {{ check_suid_sgid_search_packages_result.results
              | selectattr("rc", "equalto", 0)
@@ -53,7 +52,7 @@
              | unique }}
 
     - name: Remove packages with suid/sgid files
-      package:
+      ansible.builtin.package:
         name: "{{ item }}"
         state: absent
       when:
@@ -62,7 +61,7 @@
       loop: "{{ check_suid_sgid_packages_found }}"
 
     - name: Remove files with suid/sgid files # noqa risky-file-permissions
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: "{{ check_suid_sgid_files_state }}"
       when:
@@ -71,7 +70,7 @@
       loop: "{{ check_suid_sgid_files_found }}"
 
     - name: Stop playbook if there are suid/sgid files
-      fail:
+      ansible.builtin.fail:
         msg: >-
           The following packages containt suid/sgid files:
           {{ packages | join(", ") }}
